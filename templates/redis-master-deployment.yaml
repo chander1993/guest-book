@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redismaster.name }}
+  labels:
+    app: {{ .Values.redismaster.label }}
+spec:
+  replicas: {{ .Values.redismaster.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redismaster.label }}
+      role: {{ .Values.redismaster.role }}
+      tier: {{ .Values.redismaster.tier }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redismaster.label }}
+        role: {{ .Values.redismaster.role }}
+        tier: {{ .Values.redismaster.tier }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Values.redismaster.container.name }}
+          image: {{ .Values.redismaster.container.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 6379
+              protocol: TCP
+          resources:
+            cpu: {{ .Values.redismaster.resources.cpu }}
+            memory: {{ .Values.redismaster.resources.memory }}

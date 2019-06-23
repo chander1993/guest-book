@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.redismaster.name }}
+  labels:
+    app: {{ .Values.redismaster.label }}
+    role: {{ .Values.redismaster.role }}
+    tier: {{ .Values.redismaster.tier }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ .Values.redismaster.name }}
+    role: {{ .Values.redismaster.role }}
+    tier: {{ .Values.redismaster.tier }}

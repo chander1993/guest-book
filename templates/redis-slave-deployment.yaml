@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.redisslave.name }}
+  labels:
+    app: {{ .Values.redisslave.label }}
+spec:
+  replicas: {{ .Values.redisslave.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.redisslave.label }}
+      role: {{ .Values.redisslave.role }}
+      tier: {{ .Values.redisslave.tier }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.redisslave.label }}
+        role: {{ .Values.redisslave.role }}
+        tier: {{ .Values.redisslave.tier }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Values.redisslave.container.name }}
+          image: {{ .Values.redisslave.container.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 6379
+              protocol: TCP
+          resources:
+            cpu: {{ .Values.redisslave.resources.cpu }}
+            memory: {{ .Values.redisslave.resources.memory }}
+          env:
+          - name: GET_HOSTS_FROM
+            value: {{ .Values.redisslave.gethostfrom }}

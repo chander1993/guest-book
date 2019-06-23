@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+  labels:
+    app: {{ .Values.frontend.label }}
+spec:
+  replicas: {{ .Values.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.label }}
+      tier: {{ .Values.frontend.tier }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.label }}
+        tier: {{ .Values.frontend.tier }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Values.frontend.container.name }}
+          image: {{ .Values.frontend.container.image }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+            cpu: {{ .Values.frontend.resources.cpu }}
+            memory: {{ .Values.frontend.resources.memory }}
+          env:
+          - name: GET_HOSTS_FROM
+            value: {{ .Values.frontend.gethostfrom }}
